@@ -4,6 +4,7 @@ import (
     "bytes"
     "math/rand"
     "reflect"
+    "sort"
     "testing"
     "time"
 )
@@ -222,10 +223,10 @@ func TestNewTableFromNumItems(t *testing.T) {
     var itemCts = []uint{5, 10, 50, 100, 1050}
 
     for _, numItems := range itemCts {
-        b := make([]byte, 8)
         var arr = [][]byte{}
         table := New(numItems)
         for i := 0; uint(i) < numItems; i ++ {
+            b := make([]byte, 8)
             rand.Read(b)
             if err := table.Insert(b); err != nil {
                 t.Errorf("test Insert failed error: %v", err)
@@ -245,5 +246,63 @@ func TestNewTableFromNumItems(t *testing.T) {
                 t.Error("Added item not decoded numItems:", numItems)
             }
         }
+    }
+}
+
+func BytesArrayToSortedString(arr [][]byte) []string {
+    strArr := []string{}
+    for _, subarr := range arr {
+        strArr = append(strArr, string(subarr))
+    }
+    sort.Strings(strArr)
+
+    return strArr
+ }
+
+func TestSubtraction(t *testing.T) {
+    var numTotalItems = 50
+    var numExtractedItems = 10
+    var arr = [][]byte{}
+
+    // Populate first table with all but first 5 items
+    table1 := New(uint(numExtractedItems))
+    for i := 0; i < numTotalItems; i ++ {
+        b := make([]byte, 8)
+        rand.Read(b)
+        if i >= 5 {
+            if err := table1.Insert(b); err != nil {
+                t.Errorf("insert failed error: %v", err)
+            }
+        }
+        arr = append(arr, b)
+    }
+
+    // Populate second table with all but last 5 items
+    table2 := New(uint(numExtractedItems))
+    for i := 0; i < numTotalItems-5; i ++ {
+        if err := table2.Insert(arr[i]); err != nil {
+            t.Errorf("insert failed error: %v", err)
+        }
+    }
+
+    table1.Subtract(table2)
+    diff, _ := table1.Decode()
+
+    // Items in table1 but not table2
+    // First convert from [][]byte to sorted []string for easy comparison
+    missingTable2 := BytesArrayToSortedString(arr[numTotalItems-5:])
+    recoveredTable2 := BytesArrayToSortedString(diff.alpha.set)
+    
+    if !reflect.DeepEqual(missingTable2, recoveredTable2) {
+        t.Error("missing and recovered from table2 do not match")
+    }
+
+    // Items in table2 but not table1
+    // First convert from [][]byte to sorted []string for easy comparison
+    missingTable1 := BytesArrayToSortedString(arr[0:5])
+    recoveredTable1 := BytesArrayToSortedString(diff.beta.set)
+    
+    if !reflect.DeepEqual(missingTable1, recoveredTable1) {
+        t.Error("missing and recovered from table1 do not match")
     }
 }
