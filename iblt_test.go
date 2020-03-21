@@ -224,7 +224,7 @@ func TestNewTableFromNumItems(t *testing.T) {
     for _, numItems := range itemCts {
 	b := make([]byte, 8)
         var arr = [][]byte{}
-        table := NewTableFromNumItems(numItems, 8, 8)
+        table := New(numItems)
 		for i := 0; uint(i) < numItems; i ++ {
 			rand.Read(b)
 			if err := table.Insert(b); err != nil {

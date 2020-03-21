@@ -10,6 +10,9 @@ import (
 	"math"
 )
 
+var DEFAULT_DATA_BYTES = 8
+var DEFAULT_HASH_BYTES = 4
+
 type Table struct {
 	bktNum  uint
 	dataLen int
@@ -17,6 +20,10 @@ type Table struct {
 	hashNum int
 	buckets []*Bucket
 	bitsSet *bitset.BitSet
+}
+
+func New(numItems uint) *Table {
+    return NewTableFromNumItems(numItems, DEFAULT_DATA_BYTES, DEFAULT_HASH_BYTES)
 }
 
 func NewTableFromNumItems(numItems uint, dataLen int, hashLen int) *Table {
