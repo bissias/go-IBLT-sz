@@ -7,6 +7,7 @@ import (
 	"github.com/dchest/siphash"
 	"github.com/golang-collections/collections/queue"
 	"github.com/willf/bitset"
+	"math"
 )
 
 type Table struct {
@@ -16,6 +17,13 @@ type Table struct {
 	hashNum int
 	buckets []*Bucket
 	bitsSet *bitset.BitSet
+}
+
+func NewTableFromNumItems(numItems uint, dataLen int, hashLen int) *Table {
+    ibltParam := ibltParamMap[numItems]
+    numCells := uint(math.Ceil(float64(numItems) * float64(ibltParam.numHashFuncs) * ibltParam.itemOverhead))
+
+    return NewTable(numCells, dataLen, hashLen, ibltParam.numHashFuncs)
 }
 
 // Specify number of buckets, data field length (in byte), number of hash functions

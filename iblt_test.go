@@ -217,3 +217,33 @@ func TestTableEncodeDecode(t *testing.T) {
 		}
 	}
 }
+
+func TestNewTableFromNumItems(t *testing.T) {
+    var itemCts = []uint{5, 10, 50, 100}
+
+    for _, numItems := range itemCts {
+	b := make([]byte, 8)
+        var arr = [][]byte{}
+        table := NewTableFromNumItems(numItems, 8, 8)
+		for i := 0; uint(i) < numItems; i ++ {
+			rand.Read(b)
+			if err := table.Insert(b); err != nil {
+				t.Errorf("test Insert failed error: %v", err)
+			}
+            arr = append(arr, b)
+		}
+		diff, _ := table.Decode()
+
+        for _, item := range arr {
+            var found = false
+            for _, v := range diff.alpha.set {
+                if reflect.DeepEqual(v, item) {
+                    found = true
+                }
+            }
+            if !found {
+                t.Error("Added item not decoded numItems:", numItems)
+            }
+        }
+    }
+}
