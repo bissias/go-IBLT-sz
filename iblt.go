@@ -27,7 +27,10 @@ func New(numItems uint) *Table {
 }
 
 func NewTableFromNumItems(numItems uint, dataLen int, hashLen int) *Table {
-    ibltParam := ibltParamMap[numItems]
+    ibltParam, present := ibltParamMap[numItems]
+    if !present {
+        ibltParam = IbltParam{numHashFuncs: 4, itemOverhead: 1.36}
+    }
     numCells := uint(math.Ceil(float64(numItems) * float64(ibltParam.numHashFuncs) * ibltParam.itemOverhead))
 
     return NewTable(numCells, dataLen, hashLen, ibltParam.numHashFuncs)

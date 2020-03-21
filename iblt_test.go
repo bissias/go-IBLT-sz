@@ -219,7 +219,7 @@ func TestTableEncodeDecode(t *testing.T) {
 }
 
 func TestNewTableFromNumItems(t *testing.T) {
-    var itemCts = []uint{5, 10, 50, 100}
+    var itemCts = []uint{5, 10, 50, 100, 1050}
 
     for _, numItems := range itemCts {
 	b := make([]byte, 8)
