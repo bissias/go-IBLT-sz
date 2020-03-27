@@ -25,7 +25,7 @@ type Table struct {
 func GetIbltParams(numItems uint) IbltParam {
     ibltParam, present := ibltParamMap[numItems]
     if !present {
-        ibltParam = IbltParam{numHashFuncs: 4, itemOverhead: 1.36}
+        ibltParam = IbltParam{NumHashFuncs: 4, ItemOverhead: 1.36}
     }
 
     return ibltParam
@@ -37,9 +37,9 @@ func New(numItems uint) *Table {
 
 func NewTableFromNumItems(numItems uint, dataLen int, hashLen int) *Table {
     ibltParam := GetIbltParams(numItems)
-    numCells := uint(math.Ceil(float64(numItems) * float64(ibltParam.numHashFuncs) * ibltParam.itemOverhead))
+    numCells := uint(math.Ceil(float64(numItems) * float64(ibltParam.NumHashFuncs) * ibltParam.ItemOverhead))
 
-    return NewTable(numCells, dataLen, hashLen, ibltParam.numHashFuncs)
+    return NewTable(numCells, dataLen, hashLen, ibltParam.NumHashFuncs)
 }
 
 // Specify number of buckets, data field length (in byte), number of hash functions
