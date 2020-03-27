@@ -226,7 +226,7 @@ func TestNewTableFromNumItems(t *testing.T) {
         var arr = [][]byte{}
         table := New(numItems)
         for i := 0; uint(i) < numItems; i ++ {
-            b := make([]byte, 8)
+            b := make([]byte, 6)
             rand.Read(b)
             if err := table.Insert(b); err != nil {
                 t.Errorf("test Insert failed error: %v", err)
@@ -267,7 +267,7 @@ func TestSubtraction(t *testing.T) {
     // Populate first table with all but first 5 items
     table1 := New(uint(numExtractedItems))
     for i := 0; i < numTotalItems; i ++ {
-        b := make([]byte, 8)
+        b := make([]byte, 6)
         rand.Read(b)
         if i >= 5 {
             if err := table1.Insert(b); err != nil {
@@ -314,7 +314,7 @@ func TestSerDe(t *testing.T) {
 
     // Populate table1
     for i := 0; i < numItems; i ++ {
-        b := make([]byte, 8)
+        b := make([]byte, 6)
         rand.Read(b)
         if err := table1.Insert(b); err != nil {
             t.Errorf("insert failed error: %v", err)

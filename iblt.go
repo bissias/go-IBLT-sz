@@ -10,8 +10,8 @@ import (
     "math"
 )
 
-var DEFAULT_DATA_BYTES = 8
-var DEFAULT_HASH_BYTES = 4
+var DEFAULT_DATA_BYTES = 6
+var DEFAULT_HASH_BYTES = 3
 
 type Table struct {
     bktNum  uint
