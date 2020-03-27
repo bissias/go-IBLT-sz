@@ -306,3 +306,29 @@ func TestSubtraction(t *testing.T) {
         t.Error("missing and recovered from table1 do not match")
     }
 }
+
+func TestSerDe(t *testing.T) {
+    numItems := 50
+    var arr = [][]byte{}
+    table1 := New(uint(numItems))
+
+    // Populate table1
+    for i := 0; i < numItems; i ++ {
+        b := make([]byte, 8)
+        rand.Read(b)
+        if err := table1.Insert(b); err != nil {
+            t.Errorf("insert failed error: %v", err)
+        }
+        arr = append(arr, b)
+    }
+
+    tableBinary, _ := table1.Serialize()
+    table2, _ := Deserialize(tableBinary)
+
+    table1.Subtract(table2)
+    diff, _ := table1.Decode()
+
+    if len(diff.alpha.set) > 0 || len(diff.beta.set) > 0 {
+        t.Error("difference after deserialization should be nil")
+    }
+}
