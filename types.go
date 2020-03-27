@@ -165,24 +165,24 @@ func (s *byteSet) delete(b []byte) {
 
 // each part of symmetric difference
 type Diff struct {
-    alpha *byteSet
-    beta  *byteSet
+    Alpha *byteSet
+    Beta  *byteSet
 }
 
 // bktNum as a good estimation for cuckoo filter capacity
 func NewDiff(bktNum uint) *Diff {
     return &Diff{
-        alpha: newByteSet(bktNum),
-        beta:  newByteSet(bktNum),
+        Alpha: newByteSet(bktNum),
+        Beta:  newByteSet(bktNum),
     }
 }
 
 func (d Diff) AlphaSlice() [][]byte {
-    return d.alpha.slice()
+    return d.Alpha.slice()
 }
 
 func (d Diff) BetaSlice() [][]byte {
-    return d.beta.slice()
+    return d.Beta.slice()
 }
 
 // assume b is pure bucket
@@ -190,26 +190,26 @@ func (d *Diff) encode(b *Bucket) error {
     cpy := make([]byte, len(b.dataSum))
     copy(cpy, b.dataSum)
     if b.count == 1 {
-        if d.beta.test(cpy) {
-            d.beta.delete(cpy)
+        if d.Beta.test(cpy) {
+            d.Beta.delete(cpy)
             return errors.New("repetitive bytes found in beta")
         }
-        d.alpha.insert(cpy)
+        d.Alpha.insert(cpy)
     }
     if b.count == -1 {
-        if d.alpha.test(cpy) {
-            d.alpha.delete(cpy)
+        if d.Alpha.test(cpy) {
+            d.Alpha.delete(cpy)
             return errors.New("repetitive bytes found in alpha")
         }
-        d.beta.insert(cpy)
+        d.Beta.insert(cpy)
     }
     return nil
 }
 
 func (d Diff) AlphaLen() int {
-    return d.alpha.len()
+    return d.Alpha.len()
 }
 
 func (d Diff) BetaLen() int {
-    return d.beta.len()
+    return d.Beta.len()
 }
