@@ -22,15 +22,21 @@ type Table struct {
     bitsSet *bitset.BitSet
 }
 
+func GetIbltParams(numItems uint) IbltParam {
+    ibltParam, present := ibltParamMap[numItems]
+    if !present {
+        ibltParam = IbltParam{numHashFuncs: 4, itemOverhead: 1.36}
+    }
+
+    return ibltParam
+}
+
 func New(numItems uint) *Table {
     return NewTableFromNumItems(numItems, DEFAULT_DATA_BYTES, DEFAULT_HASH_BYTES)
 }
 
 func NewTableFromNumItems(numItems uint, dataLen int, hashLen int) *Table {
-    ibltParam, present := ibltParamMap[numItems]
-    if !present {
-        ibltParam = IbltParam{numHashFuncs: 4, itemOverhead: 1.36}
-    }
+    ibltParam := GetIbltParams(numItems)
     numCells := uint(math.Ceil(float64(numItems) * float64(ibltParam.numHashFuncs) * ibltParam.itemOverhead))
 
     return NewTable(numCells, dataLen, hashLen, ibltParam.numHashFuncs)
