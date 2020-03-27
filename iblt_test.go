@@ -237,7 +237,7 @@ func TestNewTableFromNumItems(t *testing.T) {
 
         for _, item := range arr {
             var found = false
-            for _, v := range diff.Alpha.set {
+            for _, v := range diff.Alpha.Set {
                 if reflect.DeepEqual(v, item) {
                     found = true
                 }
@@ -291,7 +291,7 @@ func TestSubtraction(t *testing.T) {
     // Items in table1 but not table2
     // First convert from [][]byte to sorted []string for easy comparison
     missingTable2 := BytesArrayToSortedString(arr[numTotalItems-5:])
-    recoveredTable2 := BytesArrayToSortedString(diff.Alpha.set)
+    recoveredTable2 := BytesArrayToSortedString(diff.Alpha.Set)
     
     if !reflect.DeepEqual(missingTable2, recoveredTable2) {
         t.Error("missing and recovered from table2 do not match")
@@ -300,7 +300,7 @@ func TestSubtraction(t *testing.T) {
     // Items in table2 but not table1
     // First convert from [][]byte to sorted []string for easy comparison
     missingTable1 := BytesArrayToSortedString(arr[0:5])
-    recoveredTable1 := BytesArrayToSortedString(diff.Beta.set)
+    recoveredTable1 := BytesArrayToSortedString(diff.Beta.Set)
     
     if !reflect.DeepEqual(missingTable1, recoveredTable1) {
         t.Error("missing and recovered from table1 do not match")
@@ -328,7 +328,7 @@ func TestSerDe(t *testing.T) {
     table1.Subtract(table2)
     diff, _ := table1.Decode()
 
-    if len(diff.Alpha.set) > 0 || len(diff.Beta.set) > 0 {
+    if len(diff.Alpha.Set) > 0 || len(diff.Beta.Set) > 0 {
         t.Error("difference after deserialization should be nil")
     }
 }

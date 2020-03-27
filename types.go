@@ -113,36 +113,36 @@ func (b Bucket) String() string {
 }
 
 type byteSet struct {
-    set    [][]byte
+    Set    [][]byte
     filter *cuckoo.Filter
 }
 
 func (s byteSet) slice() [][]byte {
-    return s.set
+    return s.Set
 }
 
 func newByteSet(cap uint) *byteSet {
     return &byteSet{
-        set:    make([][]byte, 0),
+        Set:    make([][]byte, 0),
         filter: cuckoo.NewFilter(cap),
     }
 }
 
 func (s byteSet) len() int {
-    return len(s.set)
+    return len(s.Set)
 }
 
 func (s *byteSet) insert(b []byte) {
     if !s.test(b) {
         s.filter.Insert(b)
-        s.set = append(s.set, b)
+        s.Set = append(s.Set, b)
     }
 }
 
 func (s byteSet) test(b []byte) bool {
     if s.filter.Lookup(b) {
         // possibly in set, false positive
-        for _, ele := range s.set {
+        for _, ele := range s.Set {
             if bytes.Equal(b, ele) {
                 return true
             }
@@ -154,13 +154,13 @@ func (s byteSet) test(b []byte) bool {
 func (s *byteSet) delete(b []byte) {
     s.filter.Delete(b)
     idx := 0
-    for i, ele := range s.set {
+    for i, ele := range s.Set {
         if bytes.Equal(b, ele) {
             idx = i
             break
         }
     }
-    s.set = append(s.set[:idx], s.set[idx+1:]...)
+    s.Set = append(s.Set[:idx], s.Set[idx+1:]...)
 }
 
 // each part of symmetric difference
