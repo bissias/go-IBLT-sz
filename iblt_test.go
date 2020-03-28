@@ -181,17 +181,17 @@ func TestTableEncodeDecode(t *testing.T) {
             t.Errorf("recovery from bytes error %v", err)
         }
 
-        if rec.bktNum != cpy.bktNum {
-            t.Errorf("recoveried bktNum not equal, want %v, get %v", cpy.bktNum, rec.bktNum)
+        if rec.BktNum != cpy.BktNum {
+            t.Errorf("recoveried bktNum not equal, want %v, get %v", cpy.BktNum, rec.BktNum)
         }
-        if rec.dataLen != cpy.dataLen {
-            t.Errorf("recoveried dataLen not equal, want %v, get %v", cpy.dataLen, rec.dataLen)
+        if rec.DataLen != cpy.DataLen {
+            t.Errorf("recoveried dataLen not equal, want %v, get %v", cpy.DataLen, rec.DataLen)
         }
-        if rec.hashLen != cpy.hashLen {
-            t.Errorf("recoveried hashLen not equal, want %v, get %v", cpy.hashLen, rec.hashLen)
+        if rec.HashLen != cpy.HashLen {
+            t.Errorf("recoveried hashLen not equal, want %v, get %v", cpy.HashLen, rec.HashLen)
         }
-        if rec.hashNum != cpy.hashNum {
-            t.Errorf("recoveried hashNum not equal, want %v, get %v", cpy.hashNum, rec.hashNum)
+        if rec.HashNum != cpy.HashNum {
+            t.Errorf("recoveried hashNum not equal, want %v, get %v", cpy.HashNum, rec.HashNum)
         }
         for idx, bkt := range rec.buckets {
             cpyBkt := cpy.buckets[idx]

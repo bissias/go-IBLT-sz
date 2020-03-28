@@ -14,10 +14,10 @@ var DEFAULT_DATA_BYTES = 6
 var DEFAULT_HASH_BYTES = 3
 
 type Table struct {
-    bktNum  uint
-    dataLen int
-    hashLen int
-    hashNum int
+    BktNum  uint
+    DataLen int
+    HashLen int
+    HashNum int
     buckets []*Bucket
     bitsSet *bitset.BitSet
 }
@@ -52,10 +52,10 @@ func New(numItems uint) *Table {
 // Specify number of buckets, data field length (in byte), number of hash functions
 func NewTable(buckets uint, dataLen int, hashLen int, hashNum int, ) *Table {
     return &Table{
-        bktNum:  buckets,
-        dataLen: dataLen,
-        hashLen: hashLen,
-        hashNum: hashNum,
+        BktNum:  buckets,
+        DataLen: dataLen,
+        HashLen: hashLen,
+        HashNum: hashNum,
         buckets: make([]*Bucket, buckets),
         bitsSet: bitset.New(buckets),
     }
@@ -93,23 +93,23 @@ func (t *Table) operate(d []byte, sign bool) error {
 }
 
 func (t *Table) index(d []byte) error {
-    if len(d) != t.dataLen {
+    if len(d) != t.DataLen {
         return errors.New("insert byte length mismatches base data length")
     }
 
     if t.bitsSet == nil {
-        t.bitsSet = bitset.New(t.bktNum)
+        t.bitsSet = bitset.New(t.BktNum)
     }
 
     t.bitsSet.ClearAll()
     tries := 1
-    for i := 0; i < t.hashNum; {
+    for i := 0; i < t.HashNum; {
         // assume we can always find different keys
         // as this is in high probability
         h := siphash.Hash(key0, uint64(key1+tries), d)
         tries++
         // TODO: modulo produces imbalanced uniform distribution
-        idx := uint(h) % t.bktNum
+        idx := uint(h) % t.BktNum
         if !t.bitsSet.Test(idx) {
             t.bitsSet.Set(idx)
             i++
@@ -120,7 +120,7 @@ func (t *Table) index(d []byte) error {
 }
 
 func (t Table) Copy() *Table {
-    rtn := NewTable(t.bktNum, t.dataLen, t.hashLen, t.hashNum)
+    rtn := NewTable(t.BktNum, t.DataLen, t.HashLen, t.HashNum)
     for i, bkt := range t.buckets {
         if bkt != nil {
             rtn.buckets[i] = bkt.copy()
@@ -152,7 +152,7 @@ func (t *Table) Subtract(a *Table) error {
 
 // Decode is self-destructive
 func (t *Table) Decode() (*Diff, error) {
-    diff := NewDiff(t.bktNum)
+    diff := NewDiff(t.BktNum)
     if t.empty() {
         return diff, nil
     }
@@ -168,7 +168,7 @@ func (t *Table) Decode() (*Diff, error) {
         return diff, errors.New("no pure buckets in table")
     }
 
-    bkt := NewBucket(t.dataLen, t.hashLen)
+    bkt := NewBucket(t.DataLen, t.HashLen)
     for pure.Len() > 0 {
         // clean out pure queue, delete all pure buckets and output the stored data
         // it will create more pure buckets to decode in the next cycle
@@ -229,19 +229,19 @@ func (t *Table) enqueuePure(pure *queue.Queue) error {
 }
 
 func (t Table) check(a *Table) error {
-    if t.bktNum != a.bktNum {
+    if t.BktNum != a.BktNum {
         return errors.New("subtract table mismatches bucket number")
     }
 
-    if t.dataLen != a.dataLen {
+    if t.DataLen != a.DataLen {
         return errors.New("subtract table mismatches data length")
     }
 
-    if t.hashLen != a.hashLen {
+    if t.HashLen != a.HashLen {
         return errors.New("subtract table mismatches hash length")
     }
 
-    if t.hashNum != a.hashNum {
+    if t.HashNum != a.HashNum {
         return errors.New("subtract table mismatches number of hash functions")
     }
 
@@ -254,7 +254,7 @@ func (t Table) check(a *Table) error {
 
 func (t *Table) operateBucket(idx uint, d []byte, sign bool) {
     if t.buckets[idx] == nil {
-        t.buckets[idx] = NewBucket(t.dataLen, t.hashLen)
+        t.buckets[idx] = NewBucket(t.DataLen, t.HashLen)
     }
     t.buckets[idx].operate(d, sign)
 }
@@ -263,7 +263,7 @@ func (t Table) Serialize() ([]byte, error) {
     var buffer bytes.Buffer
     twoBytes := make([]byte, 2)
 
-    for _, unsigned := range []uint16{uint16(t.bktNum), uint16(t.dataLen), uint16(t.hashLen), uint16(t.hashNum),} {
+    for _, unsigned := range []uint16{uint16(t.BktNum), uint16(t.DataLen), uint16(t.HashLen), uint16(t.HashNum),} {
         binary.BigEndian.PutUint16(twoBytes, uint16(unsigned))
         buffer.Write(twoBytes)
     }
