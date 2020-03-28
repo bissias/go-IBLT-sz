@@ -31,15 +31,22 @@ func GetIbltParams(numItems uint) IbltParam {
     return ibltParam
 }
 
-func New(numItems uint) *Table {
-    return NewTableFromNumItems(numItems, DEFAULT_DATA_BYTES, DEFAULT_HASH_BYTES)
+func GetCellCount(numItems uint) uint {
+    ibltParam := GetIbltParams(numItems)
+    numCells := uint(math.Ceil(float64(numItems) * ibltParam.ItemOverhead))
+
+    for uint(ibltParam.NumHashFuncs) * numCells / uint(ibltParam.NumHashFuncs) != numCells {
+        numCells += 1
+    }
+
+    return numCells
 }
 
-func NewTableFromNumItems(numItems uint, dataLen int, hashLen int) *Table {
+func New(numItems uint) *Table {
     ibltParam := GetIbltParams(numItems)
-    numCells := uint(math.Ceil(float64(numItems) * float64(ibltParam.NumHashFuncs) * ibltParam.ItemOverhead))
+    numCells := GetCellCount(numItems)
 
-    return NewTable(numCells, dataLen, hashLen, ibltParam.NumHashFuncs)
+    return NewTable(numCells, DEFAULT_DATA_BYTES, DEFAULT_HASH_BYTES, ibltParam.NumHashFuncs)
 }
 
 // Specify number of buckets, data field length (in byte), number of hash functions

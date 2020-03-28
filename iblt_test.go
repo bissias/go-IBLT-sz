@@ -332,3 +332,27 @@ func TestSerDe(t *testing.T) {
         t.Error("difference after deserialization should be nil")
     }
 }
+
+func TestSerializationSize(t *testing.T) {
+    size := 10
+    numItems := 2000
+    numTrials := 10
+
+    for j := 0; j < numTrials; j ++ {
+        table1 := New(uint(size))
+        for i := 0; i < numItems; i ++ {
+            b := make([]byte, 6)
+            rand.Read(b)
+            if err := table1.Insert(b); err != nil {
+                t.Errorf("insert failed error: %v", err)
+            }
+        }
+
+        tableBinary, _ := table1.Serialize()
+
+        numCells := GetCellCount(uint(size))
+        if uint(len(tableBinary)) != 13*numCells + 8 {
+            t.Error("serialization size should be 13*numCells + 8 bytes")
+        }
+    }
+}
